@@ -1,0 +1,33 @@
+name: Minecraft Server Setup
+
+on:
+  workflow_dispatch:  # Solo se ejecuta cuando tú haces clic
+
+jobs:
+  setup-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clona el repo
+        uses: actions/checkout@v3
+
+      - name: Descarga server.jar de Paper
+        run: |
+          mkdir server
+          curl -o server/server.jar https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/135/downloads/paper-1.20.1-135.jar
+
+      - name: Crea eula.txt
+        run: echo "eula=true" > server/eula.txt
+
+      - name: Crea script de inicio
+        run: |
+          echo '#!/bin/bash' > server/start.sh
+          echo 'java -Xmx2G -Xms2G -jar server.jar nogui' >> server/start.sh
+          chmod +x server/start.sh
+
+      - name: Commit archivos generados
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "GitHub Actions"
+          git add server/
+          git commit -m "Servidor preparado automáticamente"
+          git push
